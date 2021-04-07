@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello</title>
+    </head>
+    <script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <body>
+        <svg id="my_dataviz" width="630" height="350"></svg>
+        <script>
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden");
+            var groups = {};
+            function groupBy(MapOrFrequency, Attribute, data) {
+                if (groups[Attribute] == undefined) {
+                    groups[Attribute] = {};
+                }
+                var currentGroup = groups[Attribute];
+                data.forEach(function(object, i) {
+                    if (currentGroup[object[Attribute]] != undefined)
+                        if (MapOrFrequency == "Frequency")
+                            currentGroup[object[Attribute]]++;
+                        else
+                            currentGroup[object[Attribute]].push(object);
+                    else
+                        currentGroup[object[Attribute]] = (MapOrFrequency == "Frequency") ? 1 : new Array(object);
+                })
+                return currentGroup;
+            }
+            
+            var svg = d3.select("svg");
+            var width = +svg.attr("width");
+            var height = +svg.attr("height");
+            var projection = d3.geoMercator()
+                .center([0,20])                // GPS of location to zoom on
+                .scale(99)                       // This is like the zoom
+                .translate([ width/2, height/2 ]);
+            d3.queue().defer(d3.csv, "data.csv").defer(d3.json, "world.geojson").await(ready);
+            function ready(error, data, dataGeo) {
+                // ****************CSV
+                data.forEach(function(d) {d["InvoiceDate"] = d["InvoiceDate"].split(" ")[0]});
+                groupBy("Frequency", "InvoiceDate", data);
+                groupBy("Frequency", "Country", data);
+                // ****************MAP
+                svg.append("g")
+                    .selectAll("path")
+                    .data(dataGeo.features)
+                    .enter()
+                    .append("path")
+                    .attr("name", function(d) {if (groups["Country"][d.properties.name] != undefined) return d.properties.name})
+                    .attr("d", d3.geoPath().projection(projection))
+                    .style("stroke", "white")
+                    .style("opacity", .6)
+                    .attr("fill", function(d) {if (groups["Country"][d.properties.name] != undefined) {this.style.fill = "GREEN";}})
+                    .on("mouseover", function(d) {
+                        this.style.opacity = "0.9"
+                        if (groups["Country"][d.properties.name] != undefined) {
+                            tooltip.html(d.properties.name).style("visibility", "visible")
+                        }})
+                    .on("mouseout", function(d) {
+                        this.style.opacity = "0.6";
+                        if (groups["Country"][d.properties.name] != undefined) {
+                            return tooltip.style("visibility", "hidden")
+                        }})
+                    .on("mousemove", function(){return tooltip.style("top",
+                        (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+                console.log(groups);
+            }
+        </script>
+        
+    </body>
+</html>
