@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello</title>
+        <title>BI Dataset</title>
     </head>
     <script src="https://d3js.org/d3.v4.js"></script>
 	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
@@ -44,25 +44,26 @@
                 data.forEach(function(d) {d["InvoiceDate"] = d["InvoiceDate"].split(" ")[0]});
                 groupBy("Frequency", "InvoiceDate", data);
                 groupBy("Frequency", "Country", data);
+		console.log(groups["Country"])
                 // ****************MAP
                 svg.append("g")
                     .selectAll("path")
                     .data(dataGeo.features)
                     .enter()
                     .append("path")
-                    .attr("name", function(d) {if (groups["Country"][d.properties.name] != undefined) return d.properties.name})
+                    .attr("name", function(d) {if (groups["Country"][d.properties.ADMIN] != undefined) return d.properties.ADMIN})
                     .attr("d", d3.geoPath().projection(projection))
                     .style("stroke", "white")
                     .style("opacity", .6)
-                    .attr("fill", function(d) {if (groups["Country"][d.properties.name] != undefined) {this.style.fill = "GREEN";}})
+                    .attr("fill", function(d) {if (groups["Country"][d.properties.ADMIN] != undefined) {this.style.fill = "GREEN";}})
                     .on("mouseover", function(d) {
                         this.style.opacity = "0.9"
-                        if (groups["Country"][d.properties.name] != undefined) {
-                            tooltip.html(d.properties.name).style("visibility", "visible")
+                        if (groups["Country"][d.properties.ADMIN] != undefined) {
+                            tooltip.html(d.properties.ADMIN).style("visibility", "visible")
                         }})
                     .on("mouseout", function(d) {
                         this.style.opacity = "0.6";
-                        if (groups["Country"][d.properties.name] != undefined) {
+                        if (groups["Country"][d.properties.ADMIN] != undefined) {
                             return tooltip.style("visibility", "hidden")
                         }})
                     .on("mousemove", function(){return tooltip.style("top",
@@ -70,6 +71,5 @@
                 console.log(groups);
             }
         </script>
-        
     </body>
 </html>
