@@ -1,7 +1,7 @@
 D3JS project of suiting maps to datasets.<br/>
 
 <b>Run:</b><br/>
-      Download the two html files and open in browser<br>
+      Download the two html files and open in browser<br><br>
 <b>Dataset sources:</b>
 <ul>
       <li>https://www.kaggle.com/carrie1/ecommerce-data</li>
