@@ -43,7 +43,7 @@
 
 	
 	d3.queue()
-	  .defer(d3.json, "https://raw.githubusercontent.com/A-beidas/d3js/main/mao/world-map.geojson")  // World shape
+	  .defer(d3.json, "https://raw.githubusercontent.com/A-beidas/d3js/main/map/world-map.geojson")  // World shape
 	  .defer(d3.csv, "https://raw.githubusercontent.com/A-beidas/d3js/main/corona/countries.csv") // Position of circles
 	  .await(ready);
 	function ready(error, dataGeo, data) {
