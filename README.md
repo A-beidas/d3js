@@ -1,7 +1,7 @@
 D3JS project of suiting maps to datasets.<br/>
 
 <b>Run:</b><br/>
-      Download the two html files and open in browser<br><br>
+      Download the index.html file (or the two html files -bi.html and corona.html) and open locally in the browser<br><br>
 <b>Dataset sources:</b>
 <ul>
       <li>https://www.kaggle.com/carrie1/ecommerce-data</li>
