@@ -39,7 +39,7 @@ const purchases = () => {
         .defer(d3.json, "/data/countries-purchases-count.json")
         .await(ready);
     function ready(error, groups) {
-        var worldMap = require("../assets/maps/world-map.json")
+        var worldMap = require("../assets/maps/world-map-min.json")
         // ****************MAP
         svg_purchases.append("g")
             .selectAll("path")

@@ -50,7 +50,7 @@ const corona = () => {
     .defer(d3.csv, "/data/corona.csv")
     .await(ready);
     function ready(error, data) {
-		var worldMap = require("../assets/maps/world-map.json")
+		var worldMap = require("../assets/maps/world-map-min.json")
         // Add a scale for bubble size
         var valueExtent = d3.extent(data, function(d) { return +d.confirmed; })
         var size = d3.scaleSqrt()
