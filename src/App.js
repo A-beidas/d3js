@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import * as d3 from 'd3';
+import worldMap from './assets/maps/world-map.json';
+
 
 function App() {
-
     useEffect(() => {
-        purchases();
-        corona();
+        purchases(worldMap);
+        corona(worldMap);
     });
     
     return (
@@ -42,7 +43,7 @@ function App() {
     </div>)
 }
 
-const purchases = () => {
+const purchases = (worldMap) => {
     var tooltip = d3.select("#root")
         .append("div")
         .style("position", "absolute")
@@ -56,13 +57,13 @@ const purchases = () => {
         .center([0,20])                // GPS of location to zoom on
         .scale(99)                       // This is like the zoom
         .translate([ width/2, height/2 ]);
-    d3.queue().defer(d3.json, "https://raw.githubusercontent.com/A-beidas/d3js/master/bi/countries-table.json")
-                .defer(d3.json, "https://raw.githubusercontent.com/A-beidas/d3js/master/map/world-map.geojson").await(ready);
-    function ready(error, groups, dataGeo) {
+    d3.queue().defer(d3.json, "/data/countries-purchases-count.json")
+        .await(ready);
+    function ready(error, groups) {
         // ****************MAP
         svg_bi.append("g")
             .selectAll("path")
-            .data(dataGeo.features)
+            .data(worldMap.features)
             .enter()
             .append("path")
             .attr("name", function(d) {if (groups["Country"][d.properties.ADMIN] !== undefined) return d.properties.ADMIN})
@@ -87,7 +88,7 @@ const purchases = () => {
     }
 }
 
-const corona = () => {
+const corona = (worldMap) => {
     // The svg
     var svg_corona = d3.select("#corona-map"),
         width = +svg_corona.attr("width"),
@@ -112,11 +113,10 @@ const corona = () => {
         .style("border-style", "solid");
 
     
-    d3.queue()
-    .defer(d3.json, "https://raw.githubusercontent.com/A-beidas/d3js/master/map/world-map.geojson")  // World shape
-    .defer(d3.csv, "https://raw.githubusercontent.com/A-beidas/d3js/master/corona/countries.csv") // Position of circles
+    d3.queue()  // World shape
+    .defer(d3.csv, "/data/corona.csv") // Position of circles
     .await(ready);
-    function ready(error, dataGeo, data) {
+    function ready(error, data) {
         // Add a scale for bubble size
         var valueExtent = d3.extent(data, function(d) { return +d.confirmed; })
         var size = d3.scaleSqrt()
@@ -126,7 +126,7 @@ const corona = () => {
         // Draw the map
         svg_corona.append("g")
             .selectAll("path")
-            .data(dataGeo.features)
+            .data(worldMap.features)
             .enter()
             .append("path")
                 .attr("fill", "#b8b8b8")
