@@ -74,16 +74,14 @@ function chart() {
             .attr("transform", "rotate(-25)");
         // Add Y axis
         svg.append("g")
-            .call(d3.axisLeft(y))
-            .append("text")
-            .text('cases');
+            .call(d3.axisLeft(y));
         // Add the line
         svg.append("path")
             .datum(data)
             .transition()
             .duration(1000)
             .attr("fill", "none")
-            .attr("stroke", "#69b3a2")
+            .attr("stroke", "#69B3A2")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
                 .x(function(d) { return x(new Date(d.Date)) })
@@ -114,18 +112,38 @@ function chart() {
                 .y(function(d) { return y(+d.Recovered) })
                 )
             .attr("id", "recovered");
-            // Add the points
-            // svg
-            //     .append("g")
-            //     .selectAll("dot")
-            //     .data(data)
-            //     .enter()
-            //     .append("circle")
-            //     .attr("cx", function(d) { return x(d.date) } )
-            //     .attr("cy", function(d) { return y(d.value) } )
-            //     .attr("r", 5)
-            //     .attr("fill", "#69b3a2")
+        
+        var g = svg.append("g")
+            .attr("transform", "translate(740, 180)");
+        g.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "#69B3A2")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+            g.append("text")
+            .text("New cases")
+            .attr("transform", "translate(50, 10)");
 
+        var g = svg.append("g")
+            .attr("transform", "translate(740, 220)");
+        g.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "#FF5B5B")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+        g.append("text")
+            .text("Deaths")
+            .attr("transform", "translate(50, 10)");
+        var g = svg.append("g")
+            .attr("transform", "translate(740, 200)");
+        g.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "#9ACD34")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+        g.append("text")
+            .text("Recoveries")
+            .attr("transform", "translate(50, 10)");
     }
 
     
