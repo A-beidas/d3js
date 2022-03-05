@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import * as d3 from 'd3';
 
 var globalData = null;
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
+var margin = {top: 10, right: 0, bottom: 0, left: 60},
     width = 700     - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+    height = 400 - margin.top - margin.bottom;
 var x = null;
 var y = null;
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+                'Oct', 'Nov', 'Dec'];
 
 function CoronaLine() {
 
@@ -17,14 +19,13 @@ function CoronaLine() {
     return (
         <div className="col-lg-12 col-12 mb-3">
             <div className="card">
-                <div className="card-header">Corona Map</div>
+                <div className="card-header">Corona Cases Line Chart</div>
                 <div className="card-body">
+                    <h2 id="title" style={{textAlign: "center"}}></h2>
                     <div>
-                    <svg id="my_dataviz" width="930" height="700"></svg>
+                    <svg id="my_dataviz" width="930" height="450"></svg>
                     </div>
                     <select onChange={update} id="select">
-                        
-                        <option>China</option>
                         <option>Italy</option>
                         <option>Spain</option>
                         <option>France</option>
@@ -50,29 +51,33 @@ function chart() {
         .defer(d3.csv, "/data/time-series-19-covid-combined.csv")
         .await(ready);
     function ready(error, data) {
-        console.log("Ready loading");
         globalData = data;
         data = convertDataCumulative(data);
-        // Add X axis --> it is a date format
-        console.log(d3.extent(data, function(d) { return new Date(d.Date); }))
         x = d3.scaleTime()
             .domain(d3.extent(data, function(d) { return new Date(d.Date); }))
             .range([ 0, width ]);
         y = d3.scaleLinear()
-            .domain( [100, 20000])
+            .domain( [0, 30000])
             .range([ height, 0 ]);
-        
+        // Add X axis
         svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
+            .attr("transform", `translate(0, ${height})`)
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
             .call(d3.axisBottom(x).tickFormat(function(d) {
-                console.log(d);
-                return `${d.getDate()}-${d.getMonth() + 1}`
-            }));
-            // Add Y axis
-        
+                return `${d.getDate()}th of ${months[d.getMonth()]}`
+            }))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-25)");
+        // Add Y axis
         svg.append("g")
-            .call(d3.axisLeft(y));
-            // Add the line
+            .call(d3.axisLeft(y))
+            .append("text")
+            .text('cases');
+        // Add the line
         svg.append("path")
             .datum(data)
             .transition()
@@ -103,6 +108,11 @@ function chart() {
     
 }
 
+/**
+ * Filters the data for the country of selection, creates cumulative results
+ * and creates cumulutive ferquency data (discovered cases over time)
+ * @returns 
+ */
 function convertDataCumulative() {
     var data = globalData
         .filter(function(d,i) {
@@ -140,10 +150,13 @@ function convertDataCumulative() {
         })
     return data;
 }
-
+/**
+ * On the event of changing the country selection
+ */
 function update() {
     var data = convertDataCumulative();
     var line = d3.select("#line");
+    var selection = document.getElementById("select").value;
     line
         .datum(data)
         .transition()
@@ -152,6 +165,8 @@ function update() {
             .x(function(d) {return x(new Date(d.Date))})
             .y(function(d) { return y(+d.newCases) })
         );
+    var title = d3.select('#title')
+        .text(`${selection}: New cases with respect to date`)
 }
 
 export default CoronaLine; 
