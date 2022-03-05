@@ -5,10 +5,8 @@ var globalData = null;
 var margin = {top: 10, right: 30, bottom: 30, left: 60},
     width = 700     - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom;
-var x = d3.scaleLog().domain([100, 1000000]).range([0, 600]);
-var y = d3.scaleLinear()
-    .domain( [100, 20000])
-    .range([ height, 0 ]);
+var x = null;
+var y = null;
 
 function CoronaLine() {
 
@@ -55,11 +53,20 @@ function chart() {
         console.log("Ready loading");
         globalData = data;
         data = convertDataCumulative(data);
-            // Add X axis --> it is a date format
+        // Add X axis --> it is a date format
+        console.log(d3.extent(data, function(d) { return new Date(d.Date); }))
+        x = d3.scaleTime()
+            .domain(d3.extent(data, function(d) { return new Date(d.Date); }))
+            .range([ 0, width ]);
+        y = d3.scaleLinear()
+            .domain( [100, 20000])
+            .range([ height, 0 ]);
+        
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x).tickFormat(function(d) {
-                return x.tickFormat(4,d3.format(",d"))(d)
+                console.log(d);
+                return `${d.getDate()}-${d.getMonth() + 1}`
             }));
             // Add Y axis
         
@@ -74,7 +81,7 @@ function chart() {
             .attr("stroke", "#69b3a2")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
-                .x(function(d) { return x(+d.Confirmed) })
+                .x(function(d) { return x(new Date(d.Date)) })
                 .y(function(d) { return y(+d.newCases) })
                 )
             .attr("id", "line")
@@ -135,7 +142,6 @@ function convertDataCumulative() {
 }
 
 function update() {
-    console.log('hello')
     var data = convertDataCumulative();
     var line = d3.select("#line");
     line
@@ -143,7 +149,7 @@ function update() {
         .transition()
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) {return x(+d.Confirmed)})
+            .x(function(d) {return x(new Date(d.Date))})
             .y(function(d) { return y(+d.newCases) })
         );
 }
