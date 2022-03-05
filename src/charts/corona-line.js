@@ -21,7 +21,7 @@ function CoronaLine() {
             <div className="card">
                 <div className="card-header">Corona Cases Line Chart</div>
                 <div className="card-body">
-                    <h4 id="title" style={{textAlign: "center"}}>Italy: New cases with respect to date</h4>
+                    <h4 id="title" style={{textAlign: "center"}}>Italy: cases with respect to date (2020)</h4>
                     <div>
                     <svg id="my_dataviz" width="930" height="450"></svg>
                     </div>
@@ -87,10 +87,33 @@ function chart() {
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
                 .x(function(d) { return x(new Date(d.Date)) })
-                .y(function(d) { return y(+d.newCases) })
+                .y(function(d) { return y(+d.Confirmed) })
                 )
-            .attr("id", "line")
-        
+            .attr("id", "confirmed");
+        svg.append("path")
+            .datum(data)
+            .transition()
+            .duration(1000)
+            .attr("fill", "none")
+            .attr("stroke", "#ff5b5b")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()
+                .x(function(d) { return x(new Date(d.Date)) })
+                .y(function(d) { return y(+d.Deaths) })
+                )
+            .attr("id", "deaths");
+        svg.append("path")
+            .datum(data)
+            .transition()
+            .duration(1000)
+            .attr("fill", "none")
+            .attr("stroke", "#9ACD34")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()
+                .x(function(d) { return x(new Date(d.Date)) })
+                .y(function(d) { return y(+d.Recovered) })
+                )
+            .attr("id", "recovered");
             // Add the points
             // svg
             //     .append("g")
@@ -127,6 +150,7 @@ function convertDataCumulative() {
             else
                 return a.Confirmed - b.Confirmed; 
         })
+    console.log(data);
     // assuming that the data is sorted, combine frequency for cases of a country in a certain date
     data = data.filter(function(d, i) {
             if (i !== data.length - 1)
@@ -135,18 +159,10 @@ function convertDataCumulative() {
                     // var b = parseInt(data[i + 1].Confirmed);
                     data[i + 1].Confirmed = +data[i + 1].Confirmed + +d.Confirmed;
                     data[i + 1].Recovered = +data[i + 1].Recovered + +d.Recovered;
-                    data[i + 1].Deaths = +data[i + 1].Deaths + +d.Deaths;
+                    data[i + 1].Deaths    = +data[i + 1].Deaths    + +d.Deaths;
                     return false;
                 }
             return true;
-        })
-    // convert to cumulative frequency over time
-    data.forEach(function(d, i) {
-            if (i == 0) {
-                data[i].newCases = d.Confirmed;
-                return;
-            }
-            data[i].newCases = +data[i].Confirmed - +data[i - 1].Confirmed;
         })
     return data;
 }
@@ -155,18 +171,39 @@ function convertDataCumulative() {
  */
 function update() {
     var data = convertDataCumulative();
-    var line = d3.select("#line");
+    var confirmedLine = d3.select("#confirmed");
+    var deathsLine = d3.select("#deaths");
+    var recoveredLine = d3.select("#recovered");
     var selection = document.getElementById("select").value;
-    line
+
+    confirmedLine
         .datum(data)
         .transition()
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) {return x(new Date(d.Date))})
-            .y(function(d) { return y(+d.newCases) })
+            .x(function(d) { return x(new Date(d.Date))})
+            .y(function(d) { return y(+d.Confirmed) })
         );
-    var title = d3.select('#title')
-        .text(`${selection}: New cases with respect to date`)
+
+    deathsLine
+        .datum(data)
+        .transition()
+        .duration(1000)
+        .attr("d", d3.line()
+            .x(function(d) { return x(new Date(d.Date))})
+            .y(function(d) { return y(+d.Deaths) })
+        );
+
+    recoveredLine
+        .datum(data)
+        .transition()
+        .duration(1000)
+        .attr("d", d3.line()
+            .x(function(d) { return x(new Date(d.Date))})
+            .y(function(d) { return y(+d.Recovered) })
+        );
+    d3.select('#title')
+        .text(`${selection}: cases with respect to date (2020)`)
 }
 
 export default CoronaLine; 
