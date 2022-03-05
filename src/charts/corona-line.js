@@ -21,7 +21,7 @@ function CoronaLine() {
             <div className="card">
                 <div className="card-header">Corona Cases Line Chart</div>
                 <div className="card-body">
-                    <h2 id="title" style={{textAlign: "center"}}></h2>
+                    <h4 id="title" style={{textAlign: "center"}}>Italy: New cases with respect to date</h4>
                     <div>
                     <svg id="my_dataviz" width="930" height="450"></svg>
                     </div>

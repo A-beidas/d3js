@@ -13,7 +13,7 @@ function Purchases() {
                 <div className="card-header">Purchases Map</div>
                 <div className="card-body">
                     <div>
-                        <svg id="purchases-map" width="1200" height="800"></svg>
+                        <svg id="purchases-map" width="1200" height="500"></svg>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,9 @@ const purchases = () => {
         .append("div")
         .style("position", "absolute")
         .style("z-index", "10")
-        .style("visibility", "hidden");
+        .style("visibility", "hidden")
+        .style("background", "white")
+        .style("background-color", "rgba(255, 255, 255, 0.5)");
     
     var svg_purchases = d3.select("#purchases-map");
     var width = +svg_purchases.attr("width");

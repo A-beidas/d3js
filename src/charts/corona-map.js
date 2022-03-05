@@ -13,7 +13,7 @@ function CoronaMap() {
                 <div className="card-header">Corona Map</div>
                 <div className="card-body">
                     <div>
-                        <svg id="corona-map" width="1200" height="800"></svg>
+                        <svg id="corona-map" width="1200" height="500"></svg>
                     </div>
                 </div>
             </div>
