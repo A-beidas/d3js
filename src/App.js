@@ -1,7 +1,8 @@
 import {Navbar, Container, Nav} from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Purchases from "./charts/purchases";
-import Corona from "./charts/corona";
+import CoronaMap from "./charts/corona-map";
+import CoronaLine from './charts/corona-line';
 
 function App() {
     
@@ -14,17 +15,21 @@ function App() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                     <Nav.Link href="/purchases">Purchases</Nav.Link>
-                    <Nav.Link href="/corona">Corona</Nav.Link>
+                    <Nav.Link href="/corona/map">Corona Map</Nav.Link>
+                    <Nav.Link href="/corona/line">Corona Line Chart</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
         <Router>
             <Switch>
-                <Route path="/corona">
-                    <Corona/>
+                <Route path="/corona/map">
+                    <CoronaMap/>
                 </Route>
-                <Route path="/purchases">
+                <Route path="/corona/line">
+                    <CoronaLine/>
+                </Route>
+                <Route path="/business/purchases">
                     <Purchases/>
                 </Route>
                 <Route path="/">

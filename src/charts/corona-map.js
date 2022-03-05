@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { useEffect } from "react";
 
-function Corona() {
+function CoronaMap() {
 
 	useEffect(() => {
 		corona();
@@ -178,4 +178,4 @@ const corona = () => {
     }
 }
 
-export default Corona;
+export default CoronaMap;
