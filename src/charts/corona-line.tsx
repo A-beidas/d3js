@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import * as d3 from 'd3';
 
-var globalData = null;
+var globalData: any;
 var margin = {top: 10, right: 0, bottom: 0, left: 60},
     width = 700     - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
-var x = null;
-var y = null;
+var x: d3.ScaleTime<number, number>;
+var y: d3.ScaleLinear<number, number>;
 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
                 'Oct', 'Nov', 'Dec'];
 
@@ -50,11 +50,12 @@ function chart() {
     d3.queue()
         .defer(d3.csv, "/data/time-series-19-covid-combined.csv")
         .await(ready);
-    function ready(error, data) {
+    function ready(error: any, data: any) {
         globalData = data;
-        data = convertDataCumulative(data);
+        data = convertDataCumulative();
+        var extent: any = d3.extent(data, (d: any) => { return +d.confirmed; })
         x = d3.scaleTime()
-            .domain(d3.extent(data, function(d) { return new Date(d.Date); }))
+            .domain(extent)
             .range([ 0, width ]);
         y = d3.scaleLinear()
             .domain( [0, 30000])
@@ -64,7 +65,7 @@ function chart() {
             .attr("transform", `translate(0, ${height})`)
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
-            .call(d3.axisBottom(x).tickFormat(function(d) {
+            .call(d3.axisBottom(x).tickFormat((d: any) => {
                 return `${d.getDate()}th of ${months[d.getMonth()]}`
             }))
             .selectAll("text")
@@ -84,8 +85,8 @@ function chart() {
             .attr("stroke", "#69B3A2")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
-                .x(function(d) { return x(new Date(d.Date)) })
-                .y(function(d) { return y(+d.Confirmed) })
+                .x(function(d: any) { return x(new Date(d.Date)) })
+                .y(function(d: any) { return y(+d.Confirmed) })
                 )
             .attr("id", "confirmed");
         svg.append("path")
@@ -96,8 +97,8 @@ function chart() {
             .attr("stroke", "#ff5b5b")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
-                .x(function(d) { return x(new Date(d.Date)) })
-                .y(function(d) { return y(+d.Deaths) })
+                .x((d: any) => { return x(new Date(d.Date)) })
+                .y((d: any) => { return y(+d.Deaths) })
                 )
             .attr("id", "deaths");
         svg.append("path")
@@ -108,18 +109,18 @@ function chart() {
             .attr("stroke", "#9ACD34")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
-                .x(function(d) { return x(new Date(d.Date)) })
-                .y(function(d) { return y(+d.Recovered) })
+                .x((d: any) => { return x(new Date(d.Date)) })
+                .y((d: any) => { return y(+d.Recovered) })
                 )
             .attr("id", "recovered");
-        
+        var legendSymbol: string | null = d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]])
         var g = svg.append("g")
             .attr("transform", "translate(740, 180)");
         g.append("path")
             .attr("fill", "none")
             .attr("stroke", "#69B3A2")
             .attr("stroke-width", 1.5)
-            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+            .attr("d", legendSymbol!);
             g.append("text")
             .text("New cases")
             .attr("transform", "translate(50, 10)");
@@ -130,7 +131,7 @@ function chart() {
             .attr("fill", "none")
             .attr("stroke", "#FF5B5B")
             .attr("stroke-width", 1.5)
-            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+            .attr("d", legendSymbol!);
         g.append("text")
             .text("Deaths")
             .attr("transform", "translate(50, 10)");
@@ -140,7 +141,7 @@ function chart() {
             .attr("fill", "none")
             .attr("stroke", "#9ACD34")
             .attr("stroke-width", 1.5)
-            .attr("d", d3.line()([[0, 0], [20, 4], [30, 10], [40, 0]]));
+            .attr("d", );
         g.append("text")
             .text("Recoveries")
             .attr("transform", "translate(50, 10)");
@@ -156,10 +157,10 @@ function chart() {
  */
 function convertDataCumulative() {
     var data = globalData
-        .filter(function(d,i) {
-            return d.Confirmed > 100 && d.Country.localeCompare(document.getElementById('select').value) === 0;
+        .filter((d: any, i: number) => {
+            return d.Confirmed > 100 && d.Country.localeCompare(document.getElementById('select')!.value) === 0;
         })
-        .sort(function(a,b) {
+        .sort((a: any,b: any) => {
             //
             if (a.Date.localeCompare(b.Date) !== 0) 
                 return a.Date.localeCompare(b.Date);
@@ -170,7 +171,7 @@ function convertDataCumulative() {
         })
     console.log(data);
     // assuming that the data is sorted, combine frequency for cases of a country in a certain date
-    data = data.filter(function(d, i) {
+    data = data.filter((d: any, i: number) => {
             if (i !== data.length - 1)
                 if (data[i].Country.localeCompare(data[i + 1].Country) === 0 && data[i].Date.localeCompare(data[i + 1].Date) === 0) {
                     // var a = parseInt(data[i].Confirmed);
@@ -192,15 +193,15 @@ function update() {
     var confirmedLine = d3.select("#confirmed");
     var deathsLine = d3.select("#deaths");
     var recoveredLine = d3.select("#recovered");
-    var selection = document.getElementById("select").value;
+    var selection = document.getElementById("select")!.value;
 
     confirmedLine
         .datum(data)
         .transition()
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) { return x(new Date(d.Date))})
-            .y(function(d) { return y(+d.Confirmed) })
+            .x((d: any) => { return x(new Date(d.Date))})
+            .y((d: any) => { return y(+d.Confirmed) })
         );
 
     deathsLine
@@ -208,8 +209,8 @@ function update() {
         .transition()
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) { return x(new Date(d.Date))})
-            .y(function(d) { return y(+d.Deaths) })
+            .x((d: any) => { return x(new Date(d.Date))})
+            .y((d: any) => { return y(+d.Deaths) })
         );
 
     recoveredLine
@@ -217,8 +218,8 @@ function update() {
         .transition()
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) { return x(new Date(d.Date))})
-            .y(function(d) { return y(+d.Recovered) })
+            .x((d: any) => { return x(new Date(d.Date))})
+            .y((d: any) => { return y(+d.Recovered) })
         );
     d3.select('#title')
         .text(`${selection}: cases with respect to date (2020)`)
