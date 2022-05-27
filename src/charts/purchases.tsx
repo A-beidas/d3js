@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 function Purchases() {
 
@@ -29,31 +29,34 @@ const purchases = () => {
         .style("visibility", "hidden")
         .style("background", "white")
         .style("background-color", "rgba(255, 255, 255, 0.5)");
-    
+
     var svg_purchases = d3.select("#purchases-map");
     var width = +svg_purchases.attr("width");
     var height = +svg_purchases.attr("height");
-    var projection = d3.geoMercator()
-        .center([0,20])                // GPS of location to zoom on
-        .scale(99)                       // This is like the zoom
-        .translate([ width/2, height/2 ]);
+    var projection = d3
+                    .geoMercator()
+                    .center([0.0, 30.0])
+                    .scale(100.0)
+                    .translate([ width/2.0, height/2.0 ]);
+
+    var pathGenerator = d3.geoPath().projection(projection);
     d3.queue()
         .defer(d3.json, "/data/countries-purchases-count.json")
         .await(ready);
-    function ready(error, groups) {
-        var worldMap = require("../assets/maps/world-map-min.json")
+    function ready(error: any, groups: any) {
+        var worldMap:  any = require("../assets/maps/world-map-min.json")
         // ****************MAP
-        svg_purchases.append("g")
+        svg_purchases
             .selectAll("path")
             .data(worldMap.features)
             .enter()
             .append("path")
-            .attr("name", function(d) {if (groups["Country"][d.properties.ADMIN] !== undefined) return d.properties.ADMIN})
-            .attr("d", d3.geoPath().projection(projection))
+            .attr("name", function(d: any) {if (groups["Country"][d.properties.ADMIN] !== undefined) return d.properties.ADMIN})
+            .attr("d", (d: any) => pathGenerator(d))
             .style("stroke", "white")
             .style("opacity", .6)
-            .attr("fill", function(d) {if (groups["Country"][d.properties.ADMIN] !== undefined) {this.style.fill = "GREEN";}})
-            .on("mouseover", function(d) {
+            .attr("fill", (d: any) => {if (groups["Country"][d.properties.ADMIN] !== undefined) {return "GREEN";} else return "Black"})
+            .on("mouseover", function(d: any) {
                 this.style.opacity = "0.9"
                 if (groups["Country"][d.properties.ADMIN] !== undefined) {
                     tooltip.html(d.properties.ADMIN + ": " + groups["Country"][d.properties.ADMIN] + " purchases").style("visibility", "visible")
@@ -65,8 +68,11 @@ const purchases = () => {
                 this.style.opacity = "0.6";
                 tooltip.style("visibility", "hidden")
                 })
-            .on("mousemove", function(){return tooltip.style("top",
-                (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+            .on("mousemove", function(){
+                return tooltip
+                            .style("top", `${d3.event.pageY-10}px`)
+                            .style("left",`${d3.event.pageX+10}px`);
+            })
     }
 }
 
